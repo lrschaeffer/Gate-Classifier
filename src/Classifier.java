@@ -56,37 +56,32 @@ public class Classifier {
      */
     public String toString() {
         if ((AFFINE & flags) != 0) {
-            if ((flags & ORTHO)     != 0 &&
-                (flags & LINEAR)    != 0 &&
-                (flags & INF4)      == 0) {
-                return "T4";
-            } else if ((flags & INF2) == 0) {
-                return "CNOT";
-            } else {
-                if ((flags & INF0) != 0) {
-                    switch (mod) {
-                        case 0: return "EMPTY";
-                        case 1: return "NOT";
-                        default: return "NOTNOT"; /* mod = 2 */
-                    }
-                } else if ((flags & INF4) != 0) {
-                    switch (mod) {
-                        case 1: return "T6+NOT";
-                        case 2: return "T6+NOTNOT";
-                        default: return "T6"; /* mod = 4 */
-                    }
-                } else if ((flags & ORTHO) != 0) {
-                    switch (mod) {
-                        case 1: return "F4+NOT";
-                        case 2: return "F4+NOTNOT";
-                        default: return "F4"; /* mod = 4 */
-                    }
-                } else {
-                    switch (mod) {
-                        case 1: return "CNOTNOT+NOT";
-                        default: return "CNOTNOT"; /* mod = 2 */
-                    }
+            if ((flags & INF0) != 0) {
+                switch (mod) {
+                    case 0: return "EMPTY";
+                    case 1: return "NOT";
+                    default: return "NOTNOT"; /* mod = 2 */
                 }
+            } else if ((flags & INF4) != 0) {
+                switch (mod) {
+                    case 1: return "T6+NOT";
+                    case 2: return "T6+NOTNOT";
+                    default: return "T6"; /* mod = 4 */
+                }
+            } else if ((flags & ORTHO) != 0) {
+                if ((flags & LINEAR) != 0) return "T4";
+                switch (mod) {
+                    case 1: return "F4+NOT";
+                    case 2: return "F4+NOTNOT";
+                    default: return "F4"; /* mod = 4 */
+                }
+            } else if ((flags & INF2) != 0) {
+                switch (mod) {
+                    case 1: return "CNOTNOT+NOT";
+                    default: return "CNOTNOT"; /* mod = 2 */
+                }
+            } else {
+                return "CNOT";
             }
         } else {
             if (mod == 0) {
@@ -113,7 +108,7 @@ public class Classifier {
         return true;
     }
 
-    /* computes an int (bit vector) representing the set
+    /* Computes a bit vector (int) representing the set
      * { |G(x)| - |x| : x \in {0,1}^n }
      */
     public static int hw_diffs(int n, int [] G) {
@@ -127,7 +122,7 @@ public class Classifier {
         return ret;
     }
 
-    /* Computes an int (bit vector) representing the set
+    /* Computes a bit vector (int) representing the set
      * { |Ax| - |x| : unit vectors x }
      */
     public static int inf_diffs(int n, BitSet [] matrix) {
