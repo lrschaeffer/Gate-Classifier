@@ -109,7 +109,7 @@ public class Classifier {
     }
 
     /* Computes a bit vector (int) representing the set
-     * { |G(x)| - |x| : x \in {0,1}^n }
+     * W(G) = { |G(x)| - |x| : x \in {0,1}^n }
      */
     public static int hw_diffs(int n, int [] G) {
         int N = 1 << n;
@@ -199,7 +199,7 @@ public class Classifier {
         int n = 0, count = 0;
         int [] G = null;
 
-        Pattern tableEntry = Pattern.compile("([01]+)[^01]+([01]+)");
+        Pattern tableEntry = Pattern.compile("[^01]*([01]+)[^01]+([01]+)[^01]*");
         for (String line = br.readLine(); line != null; line = br.readLine()) {
             Matcher m = tableEntry.matcher(line);
             if (!m.matches()) continue;
@@ -210,7 +210,17 @@ public class Classifier {
                 G = new int[1 << n];
             }
             count++;
-            G[Integer.parseInt(x, 2)] = Integer.parseInt(y, 2);
+            if (x.length() != n) {
+                System.out.println("Error: Input length does not match gate size (" + x.length() + " != " + n + ").");
+                System.exit(1);
+            }
+            if (y.length() != n) {
+                System.out.println("Error: Output length does not match gate size (" + y.length() + " != " + n + ").");
+                System.exit(1);
+            }
+            int i = Integer.parseInt(x, 2);
+            int j = Integer.parseInt(y, 2);
+            G[i] = j;
             if (count == (1 << n)) {
                 if (!invertible(n, G)) {
                     System.out.println("Error: Non-reversible gate.");
@@ -220,6 +230,10 @@ public class Classifier {
                 System.out.println(c);
                 n = count = 0; G = null;
             }
+        }
+        if (n != 0) {
+            System.out.println("Error: End of file in the middle of a gate.");
+            System.exit(1);
         }
     }
 }
